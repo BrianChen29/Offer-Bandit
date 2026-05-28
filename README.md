@@ -1,45 +1,120 @@
-# Offer-Bandit
-Final project for USC CSCI566
+# Offer Bandit
 
+Offer Bandit is a RAG-enabled AI career assistant that helps job seekers turn a resume and target job description into a mock interview, a revised resume, a cover letter, and concrete improvement suggestions.
 
-## Abstract
-The project aims to create a product, Offer Bandit, that streamlines job search process by leveraging embeddings to enhance the relevance of generated resumes, cover letters, and interview preparation feedback. Our primary goal is to reduce the manual effort involved in job applications while improving preparation quality through realistic interview simulations. The project focuses on data collection, prompting, and pipeline design. We utilized a dataset comprising over 250 resumes, including around 200 well-revised resumes as embedding data and 50 incomplete resumes as testing data. Additionally, we collected more than 400 job descriptions from companies of varying sizes—startups, unicorns, and large enterprises—to enable precise generation of mock interview questions and customized resume and cover letter revisions tailored to specific job positions. We integrated Speech-To-Text and Text-To-Speech models to further enhance functionality and realism, enabling real-time conversational nterviews. Performance analysis demonstrated that using a GPT-4o-based API with embedding data significantly improved user satisfaction and delivered superior resume revisions. These results underscore the potential of our system to redefine the job application and interview preparation experience.
+This repository is cleaned for portfolio review: API keys, private resumes, generated embeddings, and audio files are kept out of git. The core app uses OpenAI models for interview generation and writing assistance. Pinecone-backed resume examples are optional, and the voice interview work is kept as an optional STT/TTS prototype.
 
+## Features
 
-## Introduction
-The job application process is often labor-intensive and time-consuming, requiring individuals to tailor resumes and cover letters for specific positions while also preparing for interviews. The growing demand for efficient and personalized job search tools has created a need for innovative solutions that can automate and enhance this process. 
+- Upload one or more resume PDFs.
+- Paste a target job description.
+- Generate four role-specific interview questions and two behavioral questions.
+- Collect mock interview answers through a chat-style UI.
+- Generate a revised resume, tailored cover letter, and improvement suggestions.
+- Optionally use a Pinecone vector index of example resumes as writing-style references.
+- Run optional speech utilities for Whisper-based STT and Coqui TTS-based response playback.
 
-The Offer Bandit project addresses this need by leveraging advanced natural language processing techniques, specifically Large Language Models (LLMs), to streamline key aspects of the job application journey. This project utilizes embeddings and prompting techniques to build a chat-oriented system that supports users in generating tailored resumes and cover letters, as well as preparing for interviews through simulated mock sessions. 
+## AI/ML Engineering Highlights
 
-LLMs have revolutionized natural language processing by enabling machines to understand and generate human-like text. The foundational architecture for many LLMs is the Transformer model, introduced by Vaswani et al. (2017), which employs self-attention mechanisms to process input data in parallel, leading to significant improvements in efficiency and performance. Subsequent research has expanded upon this architecture, leading to the development of various LLMs with diverse applications. For instance, Zhao et al. (2023) provide a comprehensive survey of LLMs, discussingtheir pre-training, adaptation tuning, utilization, and capacity evaluation. Similarly, Kaddour et al.(2023) explore the challenges and applications of LLMs, offering insights into their current state and potential future directions. 
+- Retrieval-augmented generation pipeline over resume examples using OpenAI embeddings and Pinecone.
+- Prompt orchestration that combines resume text, target job descriptions, interview answers, and retrieved examples.
+- Privacy-aware project packaging with local-only `.env`, resume PDFs, embedding JSON, and generated audio artifacts.
+- Optional voice prototype showing how the mock interview could evolve into a spoken interaction loop.
 
-In practical applications, LLMs have been employed across various domains, including software engineering, as discussed by Zhang et al. (2023), who examine the opportunities and risks associated with applying LLMs to software engineering tasks. Additionally, Li et al. (2024) survey the fundamental capabilities of LLMs and their applications in domain-specific scenarios, highlighting the importance of aligning these models with human preferences. 
+## Project Structure
 
-As LLMs continue to grow in size and complexity, researchers are increasingly focusing on prompting techniques to overcome the limitations associated with finetuning smaller models. Prompt-ing allows for the adaptation of LLMs to specific tasks without altering their internal parameters, thereby addressing challenges such as computational resource constraints and the need for extensive task-specific data. Chang et al. (2024) provide a comprehensive survey of efficient prompting methods, discussing how these techniques can mitigate resource consumption while effectively guiding LLMs in various natural language processing tasks. Similarly, Shin et al. (2023) empirically assess the effectiveness of different prompting strategies compared to fine-tuning smaller LLMs in automated software engineering tasks. Their findings suggest that while fine-tuned smaller models may outperform prompted larger models in certain scenarios, advanced prompting techniques, such as conversational prompting, can significantly enhance the performance of LLMs like GPT-4.These studies highlight the growing emphasis on prompting as a viable alternative to fine-tuning, especially as LLMs become more expansive and resource-intensive. By leveraging effective prompting strategies, it is possible to harness the capabilities of large models without the prohibitive costs associated with traditional fine-tuning methods. 
+```text
+.
+├── app.py                  # Streamlit UI and interview flow
+├── backend.py              # OpenAI, Pinecone, PDF extraction, and prompt orchestration
+├── embedding_resume.py     # Utility script for generating local resume example embeddings
+├── speech_tools.py         # Optional STT/TTS CLI utilities
+├── db.py                   # Optional local FAISS helper functions
+├── htmlTemplates.py        # Chat UI templates
+├── requirements.txt
+├── requirements-audio.txt
+├── .env.example
+└── .gitignore
+```
 
-By integrating advanced LLM techniques, the Offer Bandit project aims to provide a comprehensive solution that reduces manual effort and enhances the quality of job application materials and interview preparation. Instead of fine-tuning our own models, we leveraged large, pre-trained LLMs for several key reasons. First, fine-tuning requires access to an extensive dataset of high-quality resumes, which is challenging to curate at the scale needed for meaningful model improvement. Second, pre-trained large LLMs, such as GPT-4o, generally outperform smaller, fine-tuned models
-due to their superior generalization capabilities and vast knowledge base.
+## Setup
 
-To further enhance the performance of our system, we built an embedding database using over 200 well-revised resumes and 400 job descriptions collected from a variety of sources, including startups, unicorns, and large enterprises. This database allows us to leverage embeddings to tailor resume and cover letter generation to specific job positions while also generating precise and relevant mock interview questions. By combining this curated dataset with advanced prompting techniques, we
-improved the product’s ability to deliver accurate, high-quality, and context-aware outputs, effectively bridge the gap between generic LLM outputs and domain-specific requirements. This approach allowed us to maximize the performance of the model without the computational and data challenges associated with fine-tuning.
+Create and activate a virtual environment:
 
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
 
-## Data Collection
-The quality and diversity of the data are critical to the success of the Offer Bandit system. To ensure the system performs well under varying conditions and supports a broad range of job applications, we carefully curated datasets for resumes and job descriptions. The collected data were organized into embedding databases and testing datasets, ensuring both balance and representation across professional tracks.
+Install dependencies:
 
-### Resume Data Collection
-The majority of resume data were collected from the Discord recruiting group cscareers.dev, a popular community for job seekers in the tech industry. In total, we gathered over 250 resumes, which were categorized into two groups: 1) Well-Revised Resumes: Resumes belonging to individuals who successfully secured a job position; 2) Not Well-Revised Resumes: Resumes that did not meet the same standard of success.
+```bash
+pip install -r requirements.txt
+```
 
-The separation into these categories was based on the job acquisition status of the resume owners. To ensure privacy and prevent irrelevant information from impacting the embedding database, we used ChatGPT to automatically remove sensitive details such as names, schools, companies, and timelines.
+Create a local `.env` file from the example:
 
-Additionally, to maintain balance and diversity, resumes were not collected randomly. Instead, we ensured representation across different professional tracks, focusing primarily on roles within the high-tech industry. This included resumes from general software engineering tracks as well as specialized domains such as machine learning, front-end development, and embedding engineering.
+```bash
+cp .env.example .env
+```
 
-### Job Description Data Collection
-Job descriptions were sourced from Glassdoor, LinkedIn, and companies’ official recruiting websites. Following the same principle of diversity, we ensured the dataset included job descriptions from companies of varying sizes—startups, unicorns, and large enterprises. In total, we collected over 400 job descriptions, balancing representation across different professional tracks to ensure the system could effectively handle a wide variety of job roles. This diversity in job descriptions allowed us to build a robust embedding database and design realistic testing scenarios.
+Add your local API keys to `.env`:
 
-### Embedding and Testing Datasets
-To support the system’s core functionalities and evaluation, the collected resumes and job descriptions were divided into embedding databases and testing datasets: 1) Embedding Databases: Over 200 well-revised resumes were used to create the resume embedding database, while more than 400 job descriptions formed the job description embedding database. These embeddings provided the foundation for generating tailored and context-aware outputs; 2) Testing Dataset: To evaluate system performance, we constructed a diverse testing dataset that included: resume quality and job tracks. Both complete and incomplete resumes were included to test the system’s ability to enhance documents with missing information. Job descriptions covered general software engineering roles and specialized tracks such as front-end development, machine learning engineering, embedding engineering, and so on.
+```text
+OPENAI_API_KEY=...
+PINECONE_API_KEY=... # optional unless USE_RESUME_EXAMPLES=true
+```
 
-This carefully curated dataset ensured that our evaluation captured a wide range of real-world scenarios, enabling us to thoroughly analyze the Offer Bandit’s strengths and areas for improvement.
+The `.env` file is ignored by git and should never be committed.
 
+## Run
 
+```bash
+streamlit run app.py
+```
+
+The default workflow does not require the resume embedding dataset. To enable example-resume retrieval, place a local `embeddings_with_metadata.json` in the project root and set:
+
+```text
+USE_RESUME_EXAMPLES=true
+```
+
+## Generate Resume Example Embeddings
+
+Place `.docx` resumes in a local `Resume_Text_Preprocessing/` folder, then run:
+
+```bash
+python embedding_resume.py --input-dir Resume_Text_Preprocessing --output embeddings_with_metadata.json
+```
+
+Both `Resume_Text_Preprocessing/` and `embeddings_with_metadata.json` are ignored by git because they may contain private resume data.
+
+## Optional STT/TTS Prototype
+
+Install the optional audio dependencies only if you want to run the voice prototype:
+
+```bash
+pip install -r requirements-audio.txt
+```
+
+Generate speech from text:
+
+```bash
+python speech_tools.py tts --text "Tell me about a machine learning project you built." --output output.wav
+```
+
+Transcribe an audio file:
+
+```bash
+python speech_tools.py stt --audio output.wav
+```
+
+The Streamlit app currently uses text input for stability. The STT/TTS utilities preserve the voice-interview prototype without making the main demo depend on heavy audio packages.
+
+## Portfolio Notes
+
+- This project is best presented as an applied GenAI/RAG product: document ingestion, vector retrieval, prompt design, and LLM-powered workflow automation.
+- For MLE or AI Engineer roles, the strongest signals are the retrieval pipeline, evaluation-oriented resume example dataset, and optional speech-interface prototype.
+- TTS/STT was explored during the project and is included as an optional CLI prototype.
+- Pinecone is loaded lazily, so the core app can still run without a Pinecone index unless example-resume retrieval is enabled.
+- Keep all API keys and private resumes local.

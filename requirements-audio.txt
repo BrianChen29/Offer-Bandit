@@ -1,0 +1,6 @@
+# Optional dependencies for the STT/TTS prototype.
+# These packages are intentionally separate because they are large and are not
+# required for the core Streamlit app.
+openai-whisper>=20231117
+TTS>=0.22.0
+torch>=2.2
