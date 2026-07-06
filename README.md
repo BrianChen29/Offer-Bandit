@@ -21,6 +21,16 @@ This repository is cleaned for portfolio review: API keys, private resumes, gene
 - Privacy-aware project packaging with local-only `.env`, resume PDFs, embedding JSON, and generated audio artifacts.
 - Optional voice prototype showing how the mock interview could evolve into a spoken interaction loop.
 
+## Dataset & Evaluation (course project)
+
+This repository is the cleaned code. The original CSCI 566 team project ("The Dropouts," 4 people) was backed by a curated dataset and a manual evaluation:
+
+- **Dataset:** 250+ resumes (~200 well-revised used as embedding data, 50 incomplete used as testing data) and 400+ job descriptions spanning startups, unicorns, and enterprises. Resumes were sourced from a tech job-seeker community and de-identified (names/schools/companies/timelines removed) before embedding. The testing set was kept distinct from the embedding set.
+- **Embedding ablation:** the team compared generated resumes with vs. without example-resume retrieval, scored on a 5-criteria 1–10 rubric (relevance, content accuracy, language/clarity, formatting/readability, specificity/impact). Embedding-enabled outputs averaged highest (GPT-4o + embeddings ≈ 9.4 vs. 7.98 for the original resume), with the largest gains in relevance (+~32%) and impact (+~22%).
+- **Model selection by latency:** GPT-4 averaged >7.5s per question (>10s with TTS/STT), too slow for a real-time mock interview, so the system uses GPT-4o / GPT-4o-mini (<3s per question even with the voice modules).
+
+*Note: the evaluation was an internal, manual assessment by the team on a small sample — useful as a directional signal, not a claim of real-user validation. The system is a functional prototype and was not deployed.*
+
 ## Project Structure
 
 ```text
